@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Tutor's Atlas</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   VARIABLES & RESET
+══════════════════════════════════════════ */
+:root {
+  --bg:#f5f2eb; --bg2:#ede9df; --surface:#ffffff; --surface2:#f9f6f0;
+  --border:#ddd8cc; --border2:#ccc8bc; --text:#1a1814; --muted:#7a7468; --muted2:#a09890;
+  --stem:#1a6b4a; --stem-light:#e8f4ef; --stem-mid:#4a9e7a;
+  --hum:#8b4a0e;  --hum-light:#fdf0e6;  --hum-mid:#c47a3a;
+  --arts:#5a2d82; --arts-light:#f0e8f8; --arts-mid:#8a5ab2;
+  --social:#1a4a8b; --social-light:#e6eef8; --social-mid:#4a7ab2;
+  --accent:#c8381a; --shadow:rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;}
+
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:268px;min-width:268px;background:var(--text);color:var(--bg);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#333 transparent;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.content{flex:1;overflow-y:auto;padding:2rem;max-width:920px;margin:0 auto;width:100%;}
+
+/* ── SIDEBAR ── */
+.sidebar-logo{padding:1.6rem 1.4rem 1.1rem;border-bottom:1px solid #2a2a2a;}
+.sidebar-logo-title{font-family:'Libre Baskerville',serif;font-size:1.2rem;font-weight:700;line-height:1.25;}
+.sidebar-logo-sub{font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:#777;letter-spacing:.18em;text-transform:uppercase;margin-top:.25rem;}
+
+.sidebar-progress-row{padding:.8rem 1.4rem .6rem;border-bottom:1px solid #222;}
+.sidebar-progress-label{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:.15em;text-transform:uppercase;color:#666;margin-bottom:.4rem;display:flex;justify-content:space-between;}
+.sidebar-progress-bar-bg{background:#2a2a2a;border-radius:999px;height:4px;}
+.sidebar-progress-bar-fill{height:100%;border-radius:999px;background:var(--stem-mid);transition:width .5s ease;}
+
+.sidebar-search{margin:.8rem 1rem .4rem;position:relative;}
+.sidebar-search input{width:100%;background:#1e1e1e;border:1px solid #333;border-radius:6px;padding:.45rem .75rem .45rem 1.8rem;color:var(--bg);font-family:'Outfit',sans-serif;font-size:.78rem;outline:none;}
+.sidebar-search input::placeholder{color:#555;}
+.sidebar-search-icon{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);color:#555;font-size:.85rem;}
+
+.sidebar-section{padding:.6rem 0 .3rem;}
+.sidebar-section-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;padding:0 1.2rem .35rem;display:flex;align-items:center;gap:.5rem;}
+.sidebar-section-label::after{content:'';flex:1;height:1px;background:#222;}
+.label-stem{color:var(--stem-mid);} .label-hum{color:var(--hum-mid);} .label-arts{color:var(--arts-mid);} .label-social{color:var(--social-mid);}
+
+.sidebar-item{display:flex;align-items:center;gap:.55rem;padding:.4rem 1.2rem;cursor:pointer;font-size:.8rem;color:#aaa;transition:all .15s;border-left:2px solid transparent;position:relative;}
+.sidebar-item:hover{background:#1a1a1a;color:#fff;}
+.sidebar-item.active{color:#fff;background:#1e1e1e;}
+.sidebar-item.active.stem{border-left-color:var(--stem-mid);}
+.sidebar-item.active.hum{border-left-color:var(--hum-mid);}
+.sidebar-item.active.arts{border-left-color:var(--arts-mid);}
+.sidebar-item.active.social{border-left-color:var(--social-mid);}
+.sidebar-item-icon{font-size:.88rem;width:1.1rem;text-align:center;}
+.sidebar-item-check{margin-left:auto;font-size:.7rem;color:var(--stem-mid);opacity:0;transition:opacity .2s;}
+.sidebar-item-check.done{opacity:1;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.8rem 1.8rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:50;flex-wrap:wrap;gap:.5rem;}
+.topbar-breadcrumb{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.04em;}
+.topbar-breadcrumb span{color:var(--text);font-weight:500;}
+.topbar-actions{margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap;}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:500;padding:.42rem .9rem;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;}
+.btn:hover{background:var(--bg2);}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text);}
+.btn-primary:hover{background:#2e2b27;}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn-accent:hover{background:#a82e15;}
+.btn-green{background:var(--stem);color:#fff;border-color:var(--stem);}
+.btn-green:hover{background:#145538;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+.home-hero{background:var(--text);color:var(--bg);border-radius:16px;padding:2.8rem;margin-bottom:1.8rem;position:relative;overflow:hidden;}
+.home-hero::before,.home-hero::after{content:'';position:absolute;border-radius:50%;border:1px solid #2a2a2a;}
+.home-hero::before{width:180px;height:180px;top:-40px;right:-40px;}
+.home-hero::after{width:100px;height:100px;bottom:-30px;right:80px;}
+.home-hero h1{font-family:'Libre Baskerville',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);line-height:1.1;margin-bottom:.7rem;}
+.home-hero h1 em{font-style:italic;color:#888;}
+.home-hero p{color:#888;font-size:.92rem;max-width:460px;line-height:1.7;}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.8rem;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.3rem;text-align:center;}
+.stat-num{font-family:'Libre Baskerville',serif;font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:.25rem;}
+.stat-label{font-size:.72rem;color:var(--muted);}
+
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.category-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.category-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.category-card.stem::before{background:var(--stem);}
+.category-card.hum::before{background:var(--hum);}
+.category-card.arts::before{background:var(--arts);}
+.category-card.social::before{background:var(--social);}
+.category-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow);}
+.cat-icon{font-size:1.8rem;margin-bottom:.5rem;}
+.cat-name{font-family:'Libre Baskerville',serif;font-size:1.05rem;font-weight:700;margin-bottom:.25rem;}
+.cat-count{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+
+/* ══════════════════════════════════════════
+   SUBJECT VIEW
+══════════════════════════════════════════ */
+.subject-header{border-radius:12px;padding:1.8rem;margin-bottom:1.4rem;position:relative;overflow:hidden;}
+.subject-header.stem{background:var(--stem-light);border:1px solid #b8ddd0;}
+.subject-header.hum{background:var(--hum-light);border:1px solid #e8c8a0;}
+.subject-header.arts{background:var(--arts-light);border:1px solid #c8a8e8;}
+.subject-header.social{background:var(--social-light);border:1px solid #a0b8d8;}
+.subject-tag{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;padding:.18rem .55rem;border-radius:4px;margin-bottom:.7rem;display:inline-block;}
+.stem .subject-tag{background:var(--stem);color:#fff;} .hum .subject-tag{background:var(--hum);color:#fff;}
+.arts .subject-tag{background:var(--arts);color:#fff;} .social .subject-tag{background:var(--social);color:#fff;}
+.subject-title{font-family:'Libre Baskerville',serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin-bottom:.4rem;}
+.subject-desc{color:var(--muted);font-size:.88rem;max-width:500px;line-height:1.7;}
+
+/* progress ring in header */
+.subject-header-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.topic-progress-pill{background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:.3rem .8rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.05em;color:var(--muted);display:flex;align-items:center;gap:.4rem;}
+.topic-progress-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--stem);}
+
+.mode-tabs{display:flex;gap:.4rem;margin-bottom:1.3rem;flex-wrap:wrap;}
+.mode-tab{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;padding:.45rem .9rem;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .15s;}
+.mode-tab.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+.mode-tab:hover:not(.active){background:var(--bg2);}
+
+.topic-selector{margin-bottom:1.2rem;}
+.topic-selector label{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.45rem;}
+.topic-chips{display:flex;flex-wrap:wrap;gap:.45rem;}
+.topic-chip{padding:.32rem .8rem;border-radius:999px;font-size:.76rem;border:1px solid var(--border2);background:var(--surface);cursor:pointer;transition:all .15s;color:var(--text);display:flex;align-items:center;gap:.3rem;}
+.topic-chip:hover{border-color:#aaa;}
+.topic-chip.selected{background:var(--text);color:var(--bg);border-color:var(--text);}
+.topic-chip .chip-check{font-size:.6rem;color:var(--stem-mid);display:none;}
+.topic-chip.done .chip-check{display:inline;}
+.topic-chip.done{border-color:var(--stem-mid);}
+.topic-chip.done.selected .chip-check{color:#a0f0c8;}
+
+.level-selector{display:flex;gap:.45rem;margin-bottom:1.2rem;}
+.level-btn{flex:1;padding:.55rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;}
+.level-btn.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+.level-btn:hover:not(.active){background:var(--bg2);}
+
+.generate-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.3rem 1.5rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.generate-info strong{font-weight:600;font-size:.92rem;display:block;margin-bottom:.18rem;}
+.generate-info small{font-size:.75rem;color:var(--muted);}
+
+/* ══════════════════════════════════════════
+   OUTPUT PANEL
+══════════════════════════════════════════ */
+.output-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.output-panel-header{display:flex;align-items:center;gap:.8rem;padding:.9rem 1.4rem;border-bottom:1px solid var(--border);background:var(--surface2);flex-wrap:wrap;}
+.output-panel-title{font-family:'Libre Baskerville',serif;font-size:.95rem;font-weight:700;}
+.output-panel-body{padding:1.5rem;}
+
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3.5rem 2rem;gap:.8rem;}
+.loading-dots{display:flex;gap:.4rem;}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:var(--text);animation:dotPulse 1.2s ease-in-out infinite;}
+.loading-dot:nth-child(2){animation-delay:.2s;}
+.loading-dot:nth-child(3){animation-delay:.4s;}
+.loading-text{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;}
+@keyframes dotPulse{0%,100%{opacity:.2;transform:scale(.8);}50%{opacity:1;transform:scale(1.1);}}
+
+.rendered-content{line-height:1.8;}
+.rendered-content h1{font-family:'Libre Baskerville',serif;font-size:1.4rem;border-bottom:2px solid var(--border);padding-bottom:.4rem;margin:1.4rem 0 .55rem;}
+.rendered-content h2{font-family:'Libre Baskerville',serif;font-size:1.15rem;margin:1.2rem 0 .45rem;}
+.rendered-content h3{font-family:'Libre Baskerville',serif;font-size:1rem;color:var(--muted);font-weight:700;margin:1rem 0 .4rem;}
+.rendered-content p{margin:.6rem 0;font-size:.9rem;}
+.rendered-content ul,.rendered-content ol{padding-left:1.4rem;margin:.6rem 0;}
+.rendered-content li{font-size:.88rem;margin:.28rem 0;}
+.rendered-content code{background:var(--bg2);padding:.1rem .35rem;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.rendered-content pre{background:var(--text);color:var(--bg);padding:.9rem 1.1rem;border-radius:8px;margin:.9rem 0;overflow-x:auto;}
+.rendered-content pre code{background:none;padding:0;color:inherit;}
+.rendered-content blockquote{border-left:3px solid var(--border2);padding-left:.9rem;color:var(--muted);margin:.9rem 0;font-style:italic;}
+.rendered-content strong{font-weight:600;}
+.rendered-content hr{border:none;border-top:1px solid var(--border);margin:1.3rem 0;}
+
+/* ══════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════ */
+.quiz-container{display:flex;flex-direction:column;gap:1.3rem;}
+.quiz-q{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.1rem 1.2rem;}
+.quiz-q-num{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:.4rem;}
+.quiz-q-text{font-size:.9rem;font-weight:500;margin-bottom:.9rem;line-height:1.6;}
+.quiz-options{display:flex;flex-direction:column;gap:.35rem;}
+.quiz-option{display:flex;align-items:flex-start;gap:.65rem;padding:.55rem .85rem;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:.83rem;transition:all .15s;text-align:left;width:100%;}
+.quiz-option:hover:not(.disabled){border-color:#aaa;background:var(--bg2);}
+.quiz-option.selected{border-color:var(--text);background:var(--bg2);}
+.quiz-option.correct{border-color:var(--stem);background:var(--stem-light);color:var(--stem);}
+.quiz-option.wrong{border-color:var(--accent);background:#fdf0ee;color:var(--accent);}
+.opt-letter{font-family:'JetBrains Mono',monospace;font-size:.66rem;font-weight:500;min-width:1.3rem;margin-top:.05rem;}
+.quiz-feedback{margin-top:.7rem;padding:.65rem .85rem;border-radius:6px;font-size:.8rem;line-height:1.6;display:none;}
+.quiz-feedback.correct{background:var(--stem-light);color:var(--stem);border:1px solid #b8ddd0;}
+.quiz-feedback.wrong{background:#fdf0ee;color:var(--accent);border:1px solid #f0c0b0;}
+.quiz-feedback.show{display:block;}
+.quiz-score{background:var(--text);color:var(--bg);border-radius:12px;padding:2rem;text-align:center;display:none;margin-top:1.5rem;}
+.quiz-score.show{display:block;}
+.score-big{font-family:'Libre Baskerville',serif;font-size:3.5rem;font-weight:700;line-height:1;margin-bottom:.4rem;}
+.score-sub{color:#aaa;font-size:.82rem;margin-bottom:1.2rem;}
+.progress-bar-wrap{background:var(--bg2);border-radius:999px;height:5px;margin-bottom:1.2rem;overflow:hidden;}
+.progress-bar{height:100%;border-radius:999px;background:var(--text);transition:width .4s ease;}
+
+/* ══════════════════════════════════════════
+   FLASHCARDS
+══════════════════════════════════════════ */
+.flashcard-area{display:flex;flex-direction:column;align-items:center;gap:1.5rem;}
+.flashcard-meta{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.flashcard-wrap{width:100%;max-width:560px;perspective:1000px;cursor:pointer;}
+.flashcard-inner{position:relative;width:100%;height:260px;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);}
+.flashcard-inner.flipped{transform:rotateY(180deg);}
+.flashcard-face{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.flashcard-front{background:var(--text);color:var(--bg);border:1px solid #333;}
+.flashcard-back{background:var(--surface);border:2px solid var(--border2);transform:rotateY(180deg);}
+.flashcard-label{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:1rem;opacity:.5;}
+.flashcard-term{font-family:'Libre Baskerville',serif;font-size:1.5rem;font-weight:700;text-align:center;line-height:1.3;}
+.flashcard-def{font-size:.88rem;text-align:center;line-height:1.7;color:var(--muted);}
+.flashcard-hint{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:#666;position:absolute;bottom:1rem;}
+
+.flashcard-controls{display:flex;gap:.8rem;align-items:center;}
+.flashcard-nav{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);padding:.5rem 1.2rem;border:1px solid var(--border2);border-radius:6px;cursor:pointer;background:var(--surface);transition:all .15s;}
+.flashcard-nav:hover{background:var(--bg2);}
+.flashcard-nav:disabled{opacity:.3;cursor:not-allowed;}
+.flashcard-dots{display:flex;gap:.4rem;}
+.fc-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:background .2s;}
+.fc-dot.active{background:var(--text);}
+.flashcard-known-row{display:flex;gap:.6rem;}
+.btn-knew{background:var(--stem-light);color:var(--stem);border:1px solid #b8ddd0;}
+.btn-knew:hover{background:#d0f0e0;}
+.btn-didnt{background:#fdf0ee;color:var(--accent);border:1px solid #f0c0b0;}
+.btn-didnt:hover{background:#fde0d8;}
+.flashcard-score-strip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.7rem 1.2rem;display:flex;gap:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);}
+.flashcard-score-strip span{color:var(--text);font-weight:500;}
+
+/* ══════════════════════════════════════════
+   PROGRESS PAGE
+══════════════════════════════════════════ */
+.progress-page-title{font-family:'Libre Baskerville',serif;font-size:1.8rem;font-weight:700;margin-bottom:.4rem;}
+.progress-page-sub{color:var(--muted);font-size:.88rem;margin-bottom:2rem;}
+.progress-summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;}
+.progress-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center;}
+.psc-num{font-family:'Libre Baskerville',serif;font-size:2rem;font-weight:700;line-height:1;margin-bottom:.25rem;}
+.psc-label{font-size:.72rem;color:var(--muted);}
+.progress-subject-list{display:flex;flex-direction:column;gap:.8rem;}
+.progress-subject-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.3rem;}
+.psrow-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+.psrow-icon{font-size:1.1rem;}
+.psrow-name{font-family:'Libre Baskerville',serif;font-size:.95rem;font-weight:700;flex:1;}
+.psrow-pct{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);}
+.psrow-bar-bg{background:var(--bg2);border-radius:999px;height:5px;}
+.psrow-bar-fill{height:100%;border-radius:999px;transition:width .6s ease;}
+.psrow-bar-fill.stem{background:var(--stem-mid);}
+.psrow-bar-fill.hum{background:var(--hum-mid);}
+.psrow-bar-fill.arts{background:var(--arts-mid);}
+.psrow-bar-fill.social{background:var(--social-mid);}
+.psrow-topics{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.7rem;}
+.psrow-topic-chip{font-size:.7rem;padding:.2rem .55rem;border-radius:999px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);}
+.psrow-topic-chip.done{border-color:var(--stem-mid);background:var(--stem-light);color:var(--stem);}
+
+/* ══════════════════════════════════════════
+   NOTES
+══════════════════════════════════════════ */
+.notes-area{width:100%;min-height:220px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:'Outfit',sans-serif;font-size:.87rem;color:var(--text);line-height:1.7;resize:vertical;outline:none;margin-bottom:.7rem;}
+.notes-area:focus{border-color:var(--border2);}
+.notes-saved{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--stem);letter-spacing:.1em;opacity:0;transition:opacity .3s;}
+.notes-saved.show{opacity:1;}
+
+/* ══════════════════════════════════════════
+   EMPTY / MISC
+══════════════════════════════════════════ */
+.empty-state{text-align:center;padding:3.5rem 2rem;}
+.empty-icon{font-size:2.5rem;margin-bottom:.9rem;opacity:.35;}
+.empty-title{font-family:'Libre Baskerville',serif;font-size:1.15rem;margin-bottom:.4rem;}
+.empty-sub{font-size:.82rem;color:var(--muted);}
+.fade-in{animation:fadeIn .4s ease forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ══════════════════════════════════════════
+   PRINT STYLES
+══════════════════════════════════════════ */
+@media print {
+  .sidebar,.topbar,.topbar-actions,.mode-tabs,.topic-selector,
+  .level-selector,.generate-section,.output-panel-header .btn,
+  .btn,.flashcard-controls,.flashcard-known-row,
+  .flashcard-score-strip,.quiz-options button,.progress-bar-wrap { display:none !important; }
+  body { background:#fff !important; font-size:12pt; color:#000; }
+  .app { display:block; }
+  .main { display:block; }
+  .content { max-width:100%; padding:0; margin:0; }
+  .output-panel { border:none; box-shadow:none; }
+  .output-panel-body { padding:0; }
+  .output-panel-header { border:none; background:none; padding:0 0 .5rem; }
+  .rendered-content h1 { font-size:18pt; border-bottom:1pt solid #ccc; padding-bottom:4pt; margin:12pt 0 6pt; }
+  .rendered-content h2 { font-size:14pt; margin:10pt 0 4pt; }
+  .rendered-content h3 { font-size:12pt; margin:8pt 0 3pt; }
+  .rendered-content p,.rendered-content li { font-size:11pt; line-height:1.6; }
+  .subject-header { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  .quiz-q { page-break-inside:avoid; border:1pt solid #ccc; margin-bottom:12pt; padding:8pt; }
+  .quiz-option { border:1pt solid #ccc; padding:4pt 8pt; margin:3pt 0; }
+  .quiz-feedback { display:block !important; border:1pt solid #ccc; padding:4pt 8pt; margin-top:4pt; }
+  .flashcard-face { position:static !important; transform:none !important; page-break-inside:avoid; }
+  .flashcard-inner { height:auto !important; transform:none !important; page-break-inside:avoid; }
+  .flashcard-back { display:block !important; }
+  .print-page-header { display:block !important; border-bottom:2pt solid #000; padding-bottom:6pt; margin-bottom:16pt; }
+  @page { margin:2cm; }
+}
+.print-page-header{display:none;}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .home-grid{grid-template-columns:1fr;}
+  .progress-summary-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">The Tutor's<br>Atlas</div>
+    <div class="sidebar-logo-sub">Interactive Edition</div>
+  </div>
+  <div class="sidebar-progress-row">
+    <div class="sidebar-progress-label">
+      <span>Overall Progress</span>
+      <span id="sidebarProgressPct">0%</span>
+    </div>
+    <div class="sidebar-progress-bar-bg">
+      <div class="sidebar-progress-bar-fill" id="sidebarProgressFill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="sidebar-search">
+    <span class="sidebar-search-icon">⌕</span>
+    <input type="text" placeholder="Search subjects…" id="sidebarSearch" oninput="filterSidebar(this.value)">
+  </div>
+
+  <div style="padding:.5rem 1.2rem .2rem;">
+    <div class="sidebar-item" onclick="renderProgress()" style="border-radius:6px;background:#1e1e1e;color:#ccc;gap:.55rem;padding:.4rem .8rem;margin-bottom:.2rem;" id="progressNavItem">
+      <span class="sidebar-item-icon">📊</span> My Progress
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label label-stem">STEM</div>
+    <div class="sidebar-item stem" onclick="openSubject('Mathematics','stem','∑')"><span class="sidebar-item-icon">∑</span>Mathematics<span class="sidebar-item-check" id="chk-Mathematics">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Biology','stem','🧬')"><span class="sidebar-item-icon">🧬</span>Biology<span class="sidebar-item-check" id="chk-Biology">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Chemistry','stem','⚗️')"><span class="sidebar-item-icon">⚗️</span>Chemistry<span class="sidebar-item-check" id="chk-Chemistry">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Physics','stem','⚡')"><span class="sidebar-item-icon">⚡</span>Physics<span class="sidebar-item-check" id="chk-Physics">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Computer Science','stem','💻')"><span class="sidebar-item-icon">💻</span>Computer Science<span class="sidebar-item-check" id="chk-Computer Science">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Earth & Space Science','stem','🌍')"><span class="sidebar-item-icon">🌍</span>Earth &amp; Space Science<span class="sidebar-item-check" id="chk-Earth & Space Science">✓</span></div>
+    <div class="sidebar-item stem" onclick="openSubject('Statistics & Data Science','stem','📊')"><span class="sidebar-item-icon">📊</span>Statistics &amp; Data Science<span class="sidebar-item-check" id="chk-Statistics & Data Science">✓</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label label-hum">Humanities</div>
+    <div class="sidebar-item hum" onclick="openSubject('English Language Arts','hum','✍️')"><span class="sidebar-item-icon">✍️</span>English Language Arts<span class="sidebar-item-check" id="chk-English Language Arts">✓</span></div>
+    <div class="sidebar-item hum" onclick="openSubject('History','hum','🏛️')"><span class="sidebar-item-icon">🏛️</span>History<span class="sidebar-item-check" id="chk-History">✓</span></div>
+    <div class="sidebar-item hum" onclick="openSubject('Philosophy','hum','💭')"><span class="sidebar-item-icon">💭</span>Philosophy<span class="sidebar-item-check" id="chk-Philosophy">✓</span></div>
+    <div class="sidebar-item hum" onclick="openSubject('World Languages','hum','🌐')"><span class="sidebar-item-icon">🌐</span>World Languages<span class="sidebar-item-check" id="chk-World Languages">✓</span></div>
+    <div class="sidebar-item hum" onclick="openSubject('Religious Studies','hum','📿')"><span class="sidebar-item-icon">📿</span>Religious Studies<span class="sidebar-item-check" id="chk-Religious Studies">✓</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label label-arts">Arts</div>
+    <div class="sidebar-item arts" onclick="openSubject('Visual Arts','arts','🎨')"><span class="sidebar-item-icon">🎨</span>Visual Arts<span class="sidebar-item-check" id="chk-Visual Arts">✓</span></div>
+    <div class="sidebar-item arts" onclick="openSubject('Music','arts','🎵')"><span class="sidebar-item-icon">🎵</span>Music<span class="sidebar-item-check" id="chk-Music">✓</span></div>
+    <div class="sidebar-item arts" onclick="openSubject('Theatre & Film','arts','🎭')"><span class="sidebar-item-icon">🎭</span>Theatre &amp; Film<span class="sidebar-item-check" id="chk-Theatre & Film">✓</span></div>
+    <div class="sidebar-item arts" onclick="openSubject('Creative Writing','arts','📝')"><span class="sidebar-item-icon">📝</span>Creative Writing<span class="sidebar-item-check" id="chk-Creative Writing">✓</span></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label label-social">Social Sciences</div>
+    <div class="sidebar-item social" onclick="openSubject('Psychology','social','🧠')"><span class="sidebar-item-icon">🧠</span>Psychology<span class="sidebar-item-check" id="chk-Psychology">✓</span></div>
+    <div class="sidebar-item social" onclick="openSubject('Economics','social','📈')"><span class="sidebar-item-icon">📈</span>Economics<span class="sidebar-item-check" id="chk-Economics">✓</span></div>
+    <div class="sidebar-item social" onclick="openSubject('Political Science','social','🏛️')"><span class="sidebar-item-icon">🏛️</span>Political Science<span class="sidebar-item-check" id="chk-Political Science">✓</span></div>
+    <div class="sidebar-item social" onclick="openSubject('Sociology','social','👥')"><span class="sidebar-item-icon">👥</span>Sociology<span class="sidebar-item-check" id="chk-Sociology">✓</span></div>
+    <div class="sidebar-item social" onclick="openSubject('Geography','social','🗺️')"><span class="sidebar-item-icon">🗺️</span>Geography<span class="sidebar-item-check" id="chk-Geography">✓</span></div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-breadcrumb" id="breadcrumb">The Tutor's Atlas &nbsp;/&nbsp; <span>Home</span></div>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </div>
+  <div class="content" id="mainContent"></div>
+</div>
+</div><!-- end .app -->
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+const TOPICS={
+  'Mathematics':['Algebra','Geometry','Trigonometry','Calculus','Statistics','Linear Algebra','Discrete Math'],
+  'Biology':['Cell Biology','Genetics','Ecology','Evolution','Anatomy & Physiology','Microbiology'],
+  'Chemistry':['Atomic Structure','Chemical Reactions','Thermodynamics','Acids & Bases','Organic Chemistry','Electrochemistry'],
+  'Physics':['Mechanics','Electricity & Magnetism','Waves & Optics','Thermodynamics','Modern Physics','Quantum Mechanics'],
+  'Computer Science':['Programming Fundamentals','Data Structures','Algorithms','Web Development','Databases','AI & Machine Learning'],
+  'Earth & Space Science':['Plate Tectonics','Weather & Climate','Astronomy','Oceanography','Environmental Science'],
+  'Statistics & Data Science':['Descriptive Statistics','Probability','Inferential Statistics','Regression','Data Visualization'],
+  'English Language Arts':['Essay Writing','Literary Analysis','Grammar & Mechanics','Research Writing','Poetry','Rhetoric'],
+  'History':['Ancient Civilizations','Medieval Period','Modern Europe','U.S. History','World War I & II','Cold War & Postwar'],
+  'Philosophy':['Ethics','Logic','Epistemology','Metaphysics','Political Philosophy','Philosophy of Mind'],
+  'World Languages':['Grammar Fundamentals','Vocabulary Building','Conversation Skills','Reading Comprehension','Writing Skills'],
+  'Religious Studies':['World Religions','Biblical Studies','Islamic Thought','Buddhist Philosophy','Ethics & Religion'],
+  'Visual Arts':['Drawing Fundamentals','Color Theory','Art History','Composition','Design Principles'],
+  'Music':['Music Theory','Ear Training','Harmony','Rhythm & Meter','Music History','Sight-Reading'],
+  'Theatre & Film':['Acting Technique','Script Analysis','Theatre History','Directing','Cinematic Language'],
+  'Creative Writing':['Fiction Craft','Poetry Forms','Personal Essay','Narrative Structure','Dialogue','Revision Techniques'],
+  'Psychology':['Biopsychology','Cognitive Psychology','Developmental Psychology','Social Psychology','Abnormal Psychology','Research Methods'],
+  'Economics':['Supply & Demand','Market Structures','Macroeconomics','Fiscal & Monetary Policy','International Trade','Behavioral Economics'],
+  'Political Science':['U.S. Government','Comparative Politics','International Relations','Political Theory','Public Policy'],
+  'Sociology':['Culture & Society','Social Stratification','Race & Ethnicity','Social Institutions','Research Methods'],
+  'Geography':['Physical Geography','Human Geography','Population & Migration','Urban Geography','GIS & Mapping'],
+};
+
+const CAT={
+  'Mathematics':'stem','Biology':'stem','Chemistry':'stem','Physics':'stem','Computer Science':'stem',
+  'Earth & Space Science':'stem','Statistics & Data Science':'stem',
+  'English Language Arts':'hum','History':'hum','Philosophy':'hum','World Languages':'hum','Religious Studies':'hum',
+  'Visual Arts':'arts','Music':'arts','Theatre & Film':'arts','Creative Writing':'arts',
+  'Psychology':'social','Economics':'social','Political Science':'social','Sociology':'social','Geography':'social',
+};
+
+const ICONS={
+  'Mathematics':'∑','Biology':'🧬','Chemistry':'⚗️','Physics':'⚡','Computer Science':'💻',
+  'Earth & Space Science':'🌍','Statistics & Data Science':'📊',
+  'English Language Arts':'✍️','History':'🏛️','Philosophy':'💭','World Languages':'🌐','Religious Studies':'📿',
+  'Visual Arts':'🎨','Music':'🎵','Theatre & Film':'🎭','Creative Writing':'📝',
+  'Psychology':'🧠','Economics':'📈','Political Science':'🏛️','Sociology':'👥','Geography':'🗺️',
+};
+
+const DESCRIPTIONS={
+  'Mathematics':'The language of patterns, structure, and quantitative reasoning.',
+  'Biology':'The science of life — from molecules to ecosystems.',
+  'Chemistry':'The central science connecting atoms to living systems.',
+  'Physics':'The fundamental laws governing matter, energy, and the universe.',
+  'Computer Science':'Computation, algorithms, and the digital world.',
+  'Earth & Space Science':'Our planet, its systems, and the cosmos beyond.',
+  'Statistics & Data Science':'Reasoning under uncertainty and extracting meaning from data.',
+  'English Language Arts':'Reading, writing, analysis, and the power of language.',
+  'History':'The human past — causes, consequences, and continuity.',
+  'Philosophy':'Fundamental questions of knowledge, reality, and morality.',
+  'World Languages':'Acquiring proficiency and cultural fluency in a new language.',
+  'Religious Studies':'The academic study of faith, scripture, and spiritual traditions.',
+  'Visual Arts':'Visual literacy, creative expression, and art history.',
+  'Music':'Theory, performance, and the universal language of sound.',
+  'Theatre & Film':'Storytelling from stage to screen — performance and analysis.',
+  'Creative Writing':'Craft, voice, and the art of compelling narrative.',
+  'Psychology':'The science of mind, behavior, and human experience.',
+  'Economics':'How individuals, firms, and societies allocate scarce resources.',
+  'Political Science':'Power, governance, and the structures of political life.',
+  'Sociology':'Society, culture, and the forces that shape human groups.',
+  'Geography':'Place, space, and the human-environment relationship.',
+};
+
+/* ══════════════════════════════════════════
+   STATE (persistent via sessionStorage)
+══════════════════════════════════════════ */
+let prog={};       // { 'Mathematics::Algebra': true, ... }
+let notes={};      // { 'Mathematics::Algebra': 'text' }
+let quizBest={};   // { 'Mathematics::Algebra': 85 }
+
+function saveState(){
+  try{
+    sessionStorage.setItem('ta_prog', JSON.stringify(prog));
+    sessionStorage.setItem('ta_notes', JSON.stringify(notes));
+    sessionStorage.setItem('ta_best', JSON.stringify(quizBest));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    prog  = JSON.parse(sessionStorage.getItem('ta_prog')  || '{}');
+    notes = JSON.parse(sessionStorage.getItem('ta_notes') || '{}');
+    quizBest = JSON.parse(sessionStorage.getItem('ta_best') || '{}');
+  }catch(e){}
+}
+
+function markDone(subject, topic){
+  prog[subject+'::'+topic]=true;
+  saveState();
+  updateProgressUI();
+}
+
+function totalTopics(){ return Object.values(TOPICS).reduce((a,b)=>a+b.length,0); }
+function doneTopic(){ return Object.keys(prog).length; }
+
+function updateProgressUI(){
+  const pct = Math.round((doneTopic()/totalTopics())*100);
+  const fill = document.getElementById('sidebarProgressFill');
+  const lbl  = document.getElementById('sidebarProgressPct');
+  if(fill) fill.style.width = pct+'%';
+  if(lbl)  lbl.textContent  = pct+'%';
+
+  // sidebar check marks
+  Object.keys(TOPICS).forEach(subj=>{
+    const topics = TOPICS[subj];
+    const doneCnt = topics.filter(t=>prog[subj+'::'+t]).length;
+    const el = document.getElementById('chk-'+subj);
+    if(el) el.classList.toggle('done', doneCnt===topics.length);
+  });
+}
+
+/* ══════════════════════════════════════════
+   APP STATE
+══════════════════════════════════════════ */
+const st={
+  subject:null, category:null, mode:'study', level:'High School', topic:null,
+  quizData:null, quizAnswers:{},
+  fcCards:[], fcIdx:0, fcFlipped:false, fcKnew:0, fcDidnt:0,
+};
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+function renderHome(){
+  st.subject=null;
+  setBreadcrumb('Home');
+  setTopbarActions('');
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  const total=totalTopics();
+  const done=doneTopic();
+  const totalSubj=Object.keys(TOPICS).length;
+
+  document.getElementById('mainContent').innerHTML=`
+  <div class="fade-in">
+    <div class="home-hero">
+      <h1>Learn anything.<br><em>Teach everyone.</em></h1>
+      <p>Pick a subject, choose your level and topic, then generate AI-powered study guides, quizzes, problem sets, flashcards, and concept breakdowns — all in one place.</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">${totalSubj}</div><div class="stat-label">Subjects</div></div>
+      <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Topics</div></div>
+      <div class="stat-card"><div class="stat-num">${done}</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card"><div class="stat-num">${Math.round((done/total)*100)}%</div><div class="stat-label">Overall Progress</div></div>
+    </div>
+    <div class="home-grid">
+      <div class="category-card stem" onclick="openSubject('Mathematics','stem')"><div class="cat-icon">🔬</div><div class="cat-name">STEM</div><div class="cat-count">7 subjects · Math, Science, CS &amp; more</div></div>
+      <div class="category-card hum" onclick="openSubject('English Language Arts','hum')"><div class="cat-icon">📚</div><div class="cat-name">Humanities</div><div class="cat-count">5 subjects · English, History, Philosophy &amp; more</div></div>
+      <div class="category-card arts" onclick="openSubject('Visual Arts','arts')"><div class="cat-icon">🎨</div><div class="cat-name">Arts</div><div class="cat-count">4 subjects · Visual, Music, Theatre &amp; more</div></div>
+      <div class="category-card social" onclick="openSubject('Psychology','social')"><div class="cat-icon">🌎</div><div class="cat-name">Social Sciences</div><div class="cat-count">5 subjects · Psych, Economics, Sociology &amp; more</div></div>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   PROGRESS PAGE
+══════════════════════════════════════════ */
+function renderProgress(){
+  setBreadcrumb('My Progress');
+  setTopbarActions(`<button class="btn" onclick="renderHome()">← Home</button><button class="btn btn-accent" onclick="if(confirm('Reset all progress?')){prog={};notes={};quizBest={};saveState();updateProgressUI();renderProgress();}">↺ Reset</button>`);
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+
+  const done=doneTopic(), total=totalTopics();
+  const totalSubj=Object.keys(TOPICS).length;
+  const doneSubj=Object.keys(TOPICS).filter(s=>TOPICS[s].every(t=>prog[s+'::'+t])).length;
+
+  const subjectRows=Object.keys(TOPICS).map(subj=>{
+    const topics=TOPICS[subj]; const cat=CAT[subj]; const icon=ICONS[subj];
+    const doneCnt=topics.filter(t=>prog[subj+'::'+t]).length;
+    const pct=Math.round((doneCnt/topics.length)*100);
+    const chips=topics.map(t=>`<span class="psrow-topic-chip ${prog[subj+'::'+t]?'done':''}">${t}</span>`).join('');
+    return `<div class="progress-subject-row">
+      <div class="psrow-top">
+        <span class="psrow-icon">${icon}</span>
+        <span class="psrow-name">${subj}</span>
+        <span class="psrow-pct">${doneCnt}/${topics.length}</span>
+      </div>
+      <div class="psrow-bar-bg"><div class="psrow-bar-fill ${cat}" style="width:${pct}%"></div></div>
+      <div class="psrow-topics">${chips}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mainContent').innerHTML=`
+  <div class="fade-in">
+    <div class="progress-page-title">📊 My Progress</div>
+    <div class="progress-page-sub">Track which topics you've studied and where to focus next.</div>
+    <div class="progress-summary-row">
+      <div class="progress-summary-card"><div class="psc-num">${Math.round((done/total)*100)}%</div><div class="psc-label">Overall</div></div>
+      <div class="progress-summary-card"><div class="psc-num">${done}/${total}</div><div class="psc-label">Topics Done</div></div>
+      <div class="progress-summary-card"><div class="psc-num">${doneSubj}/${totalSubj}</div><div class="psc-label">Subjects Complete</div></div>
+    </div>
+    <div class="progress-subject-list">${subjectRows}</div>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   SUBJECT VIEW
+══════════════════════════════════════════ */
+function openSubject(name, cat){
+  st.subject=name; st.category=cat||CAT[name];
+  st.mode='study'; st.level='High School';
+  st.topic=TOPICS[name]?.[0]||'';
+  st.quizData=null; st.quizAnswers={};
+  st.fcCards=[]; st.fcIdx=0; st.fcFlipped=false; st.fcKnew=0; st.fcDidnt=0;
+
+  setBreadcrumb(name);
+  setTopbarActions(`<button class="btn" onclick="renderHome()">← Home</button><button class="btn" onclick="renderProgress()">📊 Progress</button><button class="btn" onclick="printCurrent()">🖨 Print</button>`);
+
+  document.querySelectorAll('.sidebar-item').forEach(i=>{
+    i.classList.remove('active');
+    const txt=i.textContent.trim().replace(/✓$/,'').trim();
+    if(txt===name||txt===name.replace('&','&amp;')) i.classList.add('active', st.category);
+  });
+  renderSubjectView();
+}
+
+function renderSubjectView(){
+  const topics=TOPICS[st.subject]||[];
+  const cat=st.category; const icon=ICONS[st.subject]||'';
+  const desc=DESCRIPTIONS[st.subject]||'';
+  const doneCnt=topics.filter(t=>prog[st.subject+'::'+t]).length;
+
+  const topicChips=topics.map(t=>{
+    const isDone=prog[st.subject+'::'+t];
+    return `<div class="topic-chip${st.topic===t?' selected':''}${isDone?' done':''}" onclick="selectTopic('${esc(t)}')">${t}<span class="chip-check">✓</span></div>`;
+  }).join('');
+
+  const levels=['Middle School','High School','College'];
+  const levelBtns=levels.map(l=>`<div class="level-btn${st.level===l?' active':''}" onclick="selectLevel('${l}')">${l}</div>`).join('');
+
+  const modes=[
+    {id:'study',label:'📖 Study Guide'},
+    {id:'concept',label:'💡 Concept'},
+    {id:'quiz',label:'🧠 Quiz'},
+    {id:'problems',label:'✏️ Problems'},
+    {id:'flashcards',label:'🃏 Flashcards'},
+    {id:'notes',label:'📓 Notes'},
+  ];
+  const modeTabs=modes.map(m=>`<div class="mode-tab${st.mode===m.id?' active':''}" onclick="selectMode('${m.id}')">${m.label}</div>`).join('');
+
+  const modeDesc={
+    study:'Comprehensive study guide with concepts, definitions, and examples.',
+    concept:'Deep conceptual breakdown — the why behind the topic.',
+    quiz:'6-question multiple-choice quiz with instant feedback.',
+    problems:'5-problem set ranging easy to hard, with full solutions.',
+    flashcards:'AI-generated term/definition cards. Flip to reveal.',
+    notes:'Your personal notes for this topic.',
+  };
+
+  const noteKey=st.subject+'::'+st.topic;
+  const savedNote=notes[noteKey]||'';
+
+  const generatePanel = st.mode!=='notes' ? `
+    <div class="generate-section">
+      <div class="generate-info">
+        <strong>${icon} ${st.topic} — ${st.level}</strong>
+        <small>${modeDesc[st.mode]}</small>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        ${st.mode!=='flashcards'&&st.mode!=='notes'?`<button class="btn" onclick="markDone('${esc(st.subject)}','${esc(st.topic)}')">✓ Mark Done</button>`:''}
+        <button class="btn btn-primary" id="generateBtn" onclick="generateContent()">✦ Generate</button>
+      </div>
+    </div>
+    <div class="output-panel" id="outputPanel">
+      <div class="empty-state">
+        <div class="empty-icon">✦</div>
+        <div class="empty-title">Ready to generate</div>
+        <div class="empty-sub">Click Generate to create your ${st.mode==='quiz'?'quiz':st.mode==='problems'?'problem set':st.mode==='flashcards'?'flashcard deck':'material'}.</div>
+      </div>
+    </div>` : `
+    <div class="output-panel">
+      <div class="output-panel-header">
+        <div class="output-panel-title">📓 Notes — ${st.topic}</div>
+        <span class="notes-saved" id="notesSaved">✓ Saved</span>
+        <button class="btn" style="margin-left:auto;" onclick="markDone('${esc(st.subject)}','${esc(st.topic)}')">✓ Mark Done</button>
+      </div>
+      <div class="output-panel-body">
+        <textarea class="notes-area" id="notesArea" placeholder="Write your notes here…" oninput="saveNote()">${savedNote}</textarea>
+        <div style="font-size:.75rem;color:var(--muted);">Notes are saved for this session.</div>
+      </div>
+    </div>`;
+
+  document.getElementById('mainContent').innerHTML=`
+  <div class="fade-in">
+    <div class="print-page-header">
+      <strong style="font-family:'Libre Baskerville',serif;font-size:18pt;">The Tutor's Atlas</strong>
+      <span style="margin-left:1rem;font-size:10pt;color:#666;">${st.subject} · ${st.topic} · ${st.level}</span>
+    </div>
+    <div class="subject-header ${cat}">
+      <div class="subject-header-top">
+        <div>
+          <div class="subject-tag">${cat.toUpperCase()}</div>
+          <div class="subject-title">${icon} ${st.subject}</div>
+          <div class="subject-desc">${desc}</div>
+        </div>
+        <div class="topic-progress-pill"><span class="dot"></span>${doneCnt}/${topics.length} topics done</div>
+      </div>
+    </div>
+    <div class="topic-selector"><label>Select Topic</label><div class="topic-chips">${topicChips}</div></div>
+    <div class="level-selector">${levelBtns}</div>
+    <div class="mode-tabs">${modeTabs}</div>
+    ${generatePanel}
+  </div>`;
+}
+
+function selectTopic(t){ st.topic=t; st.quizData=null; st.quizAnswers={}; st.fcCards=[]; renderSubjectView(); }
+function selectLevel(l){ st.level=l; st.quizData=null; st.quizAnswers={}; st.fcCards=[]; renderSubjectView(); }
+function selectMode(m){ st.mode=m; st.quizData=null; st.quizAnswers={}; st.fcCards=[]; renderSubjectView(); }
+
+/* ══════════════════════════════════════════
+   NOTES
+══════════════════════════════════════════ */
+function saveNote(){
+  const ta=document.getElementById('notesArea');
+  if(!ta) return;
+  notes[st.subject+'::'+st.topic]=ta.value;
+  saveState();
+  const saved=document.getElementById('notesSaved');
+  if(saved){saved.classList.add('show');setTimeout(()=>saved.classList.remove('show'),1500);}
+}
+
+/* ══════════════════════════════════════════
+   GENERATE
+══════════════════════════════════════════ */
+async function generateContent(){
+  const btn=document.getElementById('generateBtn');
+  if(btn) btn.disabled=true;
+  const panel=document.getElementById('outputPanel');
+  panel.innerHTML=`<div class="loading"><div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div><div class="loading-text">Generating ${st.mode}…</div></div>`;
+
+  const prompts={
+    study:`Create a detailed study guide for "${st.topic}" in ${st.subject} at ${st.level} level.
+Structure:
+## Overview
+## Key Concepts  
+## Core Content
+## Key Terms & Definitions
+## Examples & Applications
+## Common Mistakes
+## Summary
+Be thorough. Use markdown.`,
+
+    concept:`Create a deep conceptual breakdown of "${st.topic}" in ${st.subject} for ${st.level}.
+## The Big Idea
+## How It Actually Works
+## The Underlying Logic
+## Connections to Other Topics
+## Mental Model / Analogy
+## "Aha Moment" Explanations
+## Questions That Sharpen Understanding
+Go beyond surface definitions. Use markdown.`,
+
+    quiz:`Create a 6-question multiple-choice quiz on "${st.topic}" in ${st.subject} at ${st.level} level.
+Return ONLY valid JSON, no markdown fences:
+{"title":"...","questions":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"answer":0,"explanation":"..."}]}
+answer is 0-indexed. Mix conceptual, application, and recall questions.`,
+
+    problems:`Create a problem set with 5 practice problems on "${st.topic}" in ${st.subject} at ${st.level}.
+## Problem Set: ${st.topic}
+Problems 1 (basic) through 5 (complex). For each: state problem, provide hint, show step-by-step solution, explain the key insight. Use markdown.`,
+
+    flashcards:`Create 8 flashcards for "${st.topic}" in ${st.subject} at ${st.level} level.
+Return ONLY valid JSON, no markdown fences:
+{"cards":[{"term":"...","definition":"..."}]}
+Terms should be key vocabulary, concepts, or formulas. Definitions should be clear, concise, and educational.`,
+  };
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompts[st.mode]}]})
+    });
+    const data=await res.json();
+    const text=data.content?.map(c=>c.text||'').join('')||'';
+
+    if(st.mode==='quiz'){
+      try{
+        const q=JSON.parse(text.replace(/```json|```/g,'').trim());
+        st.quizData=q; st.quizAnswers={};
+        renderQuiz(q);
+      }catch{ renderMarkdown(panel,text); }
+    } else if(st.mode==='flashcards'){
+      try{
+        const fc=JSON.parse(text.replace(/```json|```/g,'').trim());
+        st.fcCards=fc.cards||[]; st.fcIdx=0; st.fcFlipped=false; st.fcKnew=0; st.fcDidnt=0;
+        renderFlashcards();
+      }catch{ renderMarkdown(panel,text); }
+    } else {
+      renderMarkdown(panel,text);
+    }
+    // auto-mark done after generating study guide or concept
+    if(st.mode==='study'||st.mode==='concept'){ markDone(st.subject,st.topic); }
+  }catch(err){
+    panel.innerHTML=`<div class="output-panel-header"><div class="output-panel-title">⚠️ Error</div></div><div class="output-panel-body"><p style="color:var(--accent);font-size:.85rem;">Could not generate. Please try again.<br><small>${err.message}</small></p></div>`;
+  }
+  if(btn) btn.disabled=false;
+}
+
+/* ══════════════════════════════════════════
+   MARKDOWN RENDERER
+══════════════════════════════════════════ */
+function renderMarkdown(panel,text){
+  const html=text
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/^[-•] (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`)
+    .replace(/\n\n/g,'</p><p>').trim();
+
+  const titles={'study':'📖 Study Guide','concept':'💡 Concept Breakdown','problems':'✏️ Problem Set'};
+  const title=titles[st.mode]||'Result';
+
+  panel.innerHTML=`
+    <div class="output-panel-header">
+      <div class="output-panel-title">${title}: ${st.topic}</div>
+      <div style="margin-left:auto;display:flex;gap:.4rem;">
+        <button class="btn" onclick="copyContent()">⎘ Copy</button>
+        <button class="btn" onclick="printCurrent()">🖨 Print</button>
+      </div>
+    </div>
+    <div class="output-panel-body">
+      <div class="rendered-content fade-in"><p>${html}</p></div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════ */
+function renderQuiz(quiz){
+  const panel=document.getElementById('outputPanel');
+  const qHTML=quiz.questions.map((q,qi)=>{
+    const opts=q.options.map((opt,oi)=>`
+      <button class="quiz-option" id="opt-${qi}-${oi}" onclick="answerQuiz(${qi},${oi},${q.answer},'${esc(q.explanation)}')">
+        <span class="opt-letter">${['A','B','C','D'][oi]}</span>
+        <span>${opt.replace(/^[A-D]\)\s*/,'')}</span>
+      </button>`).join('');
+    return `<div class="quiz-q" id="qq-${qi}">
+      <div class="quiz-q-num">Question ${qi+1} of ${quiz.questions.length}</div>
+      <div class="quiz-q-text">${q.question}</div>
+      <div class="quiz-options">${opts}</div>
+      <div class="quiz-feedback" id="fb-${qi}"></div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML=`
+    <div class="output-panel-header">
+      <div class="output-panel-title">🧠 ${quiz.title||'Quiz'}</div>
+      <div style="margin-left:auto;display:flex;gap:.4rem;">
+        <button class="btn btn-primary" onclick="submitQuiz()">Submit</button>
+        <button class="btn" onclick="printCurrent()">🖨 Print</button>
+      </div>
+    </div>
+    <div class="output-panel-body">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="quizProgress" style="width:0%"></div></div>
+      <div class="quiz-container fade-in">${qHTML}</div>
+      <div class="quiz-score" id="quizScore">
+        <div class="score-big" id="scoreNum">—</div>
+        <div class="score-sub" id="scoreLabel"></div>
+        <div style="display:flex;gap:.6rem;justify-content:center;margin-top:1rem;">
+          <button class="btn btn-primary" onclick="generateContent()">↻ New Quiz</button>
+          <button class="btn" onclick="printCurrent()">🖨 Print Results</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function answerQuiz(qi,oi,correct,explanation){
+  if(st.quizAnswers[qi]!==undefined) return;
+  st.quizAnswers[qi]=oi;
+  document.querySelectorAll(`#qq-${qi} .quiz-option`).forEach((o,i)=>{
+    o.classList.add('disabled');
+    if(i===correct) o.classList.add('correct');
+    else if(i===oi&&oi!==correct) o.classList.add('wrong');
+  });
+  const fb=document.getElementById(`fb-${qi}`);
+  const ok=oi===correct;
+  fb.textContent=(ok?'✓ Correct! ':'✗ Incorrect. ')+explanation;
+  fb.className=`quiz-feedback ${ok?'correct':'wrong'} show`;
+  const total=st.quizData?.questions?.length||1;
+  const answered=Object.keys(st.quizAnswers).length;
+  const el=document.getElementById('quizProgress');
+  if(el) el.style.width=`${(answered/total)*100}%`;
+}
+
+function submitQuiz(){
+  if(!st.quizData) return;
+  const qs=st.quizData.questions;
+  let correct=0;
+  qs.forEach((q,qi)=>{ if(st.quizAnswers[qi]===q.answer) correct++; });
+  const pct=Math.round((correct/qs.length)*100);
+  // save best score
+  const key=st.subject+'::'+st.topic;
+  if(!quizBest[key]||pct>quizBest[key]){ quizBest[key]=pct; saveState(); }
+  if(pct>=70) markDone(st.subject,st.topic);
+  const sc=document.getElementById('quizScore');
+  document.getElementById('scoreNum').textContent=pct+'%';
+  document.getElementById('scoreLabel').textContent=`${correct} / ${qs.length} correct${pct>=70?' — Topic marked complete! ✓':''}`;
+  sc.classList.add('show');
+  sc.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ══════════════════════════════════════════
+   FLASHCARDS
+══════════════════════════════════════════ */
+function renderFlashcards(){
+  const panel=document.getElementById('outputPanel');
+  const cards=st.fcCards;
+  if(!cards||!cards.length){
+    panel.innerHTML=`<div class="output-panel-body"><p>No cards generated.</p></div>`;
+    return;
+  }
+  const card=cards[st.fcIdx];
+  const dots=cards.map((_,i)=>`<span class="fc-dot${i===st.fcIdx?' active':''}"></span>`).join('');
+
+  panel.innerHTML=`
+    <div class="output-panel-header">
+      <div class="output-panel-title">🃏 Flashcards — ${st.topic}</div>
+      <div style="margin-left:auto;display:flex;gap:.4rem;">
+        <button class="btn" onclick="generateContent()">↻ New Deck</button>
+        <button class="btn" onclick="printCurrent()">🖨 Print</button>
+      </div>
+    </div>
+    <div class="output-panel-body">
+      <div class="flashcard-area fade-in">
+        <div class="flashcard-score-strip">
+          Known: <span id="fcKnewCount">${st.fcKnew}</span> &nbsp;|&nbsp; 
+          Still learning: <span id="fcDidntCount">${st.fcDidnt}</span> &nbsp;|&nbsp;
+          Card: <span>${st.fcIdx+1}/${cards.length}</span>
+        </div>
+        <div class="flashcard-meta">Click card to flip</div>
+        <div class="flashcard-wrap" onclick="flipCard()">
+          <div class="flashcard-inner${st.fcFlipped?' flipped':''}" id="fcInner">
+            <div class="flashcard-face flashcard-front">
+              <div class="flashcard-label">Term</div>
+              <div class="flashcard-term">${card.term}</div>
+              <div class="flashcard-hint">tap to reveal definition</div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div class="flashcard-label">Definition</div>
+              <div class="flashcard-def">${card.definition}</div>
+            </div>
+          </div>
+        </div>
+        <div class="flashcard-dots">${dots}</div>
+        <div class="flashcard-known-row">
+          <button class="btn btn-didnt" onclick="fcRespond(false)">✗ Still learning</button>
+          <button class="btn btn-knew" onclick="fcRespond(true)">✓ Got it</button>
+        </div>
+        <div class="flashcard-controls">
+          <button class="flashcard-nav" onclick="fcNav(-1)" ${st.fcIdx===0?'disabled':''}>← Prev</button>
+          <button class="flashcard-nav" onclick="fcNav(1)" ${st.fcIdx===cards.length-1?'disabled':''}>Next →</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function flipCard(){
+  st.fcFlipped=!st.fcFlipped;
+  const el=document.getElementById('fcInner');
+  if(el) el.classList.toggle('flipped',st.fcFlipped);
+}
+
+function fcNav(dir){
+  st.fcIdx=Math.max(0,Math.min(st.fcCards.length-1,st.fcIdx+dir));
+  st.fcFlipped=false;
+  renderFlashcards();
+}
+
+function fcRespond(knew){
+  if(knew) st.fcKnew++; else st.fcDidnt++;
+  // auto-advance
+  if(st.fcIdx<st.fcCards.length-1){
+    st.fcIdx++; st.fcFlipped=false; renderFlashcards();
+  } else {
+    // finished deck
+    if(st.fcKnew===st.fcCards.length) markDone(st.subject,st.topic);
+    const panel=document.getElementById('outputPanel');
+    panel.innerHTML=`
+      <div class="output-panel-header"><div class="output-panel-title">🃏 Deck Complete!</div></div>
+      <div class="output-panel-body">
+        <div class="quiz-score show" style="display:block;">
+          <div class="score-big">${Math.round((st.fcKnew/st.fcCards.length)*100)}%</div>
+          <div class="score-sub">${st.fcKnew}/${st.fcCards.length} cards known${st.fcKnew===st.fcCards.length?' — Topic marked complete! ✓':''}</div>
+          <div style="display:flex;gap:.6rem;justify-content:center;margin-top:1rem;">
+            <button class="btn btn-primary" onclick="st.fcIdx=0;st.fcFlipped=false;st.fcKnew=0;st.fcDidnt=0;renderFlashcards();">↻ Restart Deck</button>
+            <button class="btn" onclick="generateContent()">New Deck</button>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PRINT
+══════════════════════════════════════════ */
+function printCurrent(){ window.print(); }
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function copyContent(){
+  const el=document.querySelector('.rendered-content');
+  if(el) navigator.clipboard.writeText(el.innerText).catch(()=>{});
+}
+function setBreadcrumb(page){
+  document.getElementById('breadcrumb').innerHTML=`The Tutor's Atlas &nbsp;/&nbsp; <span>${page}</span>`;
+}
+function setTopbarActions(html){
+  document.getElementById('topbarActions').innerHTML=html;
+}
+function esc(s){ return (s||'').replace(/'/g,"\\'").replace(/\n/g,' '); }
+function filterSidebar(q){
+  document.querySelectorAll('.sidebar-item').forEach(i=>{
+    const txt=i.textContent.toLowerCase();
+    i.style.display=(!q||txt.includes(q.toLowerCase()))?'':'none';
+  });
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+loadState();
+updateProgressUI();
+renderHome();
+</script>
+</body>
+</html>
